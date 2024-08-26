@@ -26,17 +26,17 @@ func matchCommand(input string, cfg *config) cliCommand {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		}
-	case "next":
+	case "map":
 		return cliCommand{
-			name:        "next",
+			name:        "map",
 			description: "Get the next 20 locations",
-			callback:    cfg.commandNext,
+			callback:    cfg.commandMap,
 		}
-	case "back":
+	case "mapb":
 		return cliCommand{
-			name:        "next",
+			name:        "mapb",
 			description: "Get the previous 20 locations",
-			callback:    cfg.commandBack,
+			callback:    cfg.commandMapb,
 		}
 	default:
 		return cliCommand{
@@ -57,19 +57,23 @@ func commandExit() error {
 	return nil
 }
 
-func (cfg *config) commandNext() error {
+func (cfg *config) commandMap() error {
 	cfg.page++
-	fmt.Printf("Page number: %d\n", cfg.page)
+
+	getAndPrintPage(cfg)
+
 	return nil
 }
 
-func (cfg *config) commandBack() error {
-	if cfg.page == 0 {
+func (cfg *config) commandMapb() error {
+	if cfg.page <= 0 {
 		fmt.Printf("Error: you are on the first page.\n")
 		return nil
 	}
 	cfg.page--
-	fmt.Printf("Page number: %d\n", cfg.page)
+
+	getAndPrintPage(cfg)
+
 	return nil
 }
 

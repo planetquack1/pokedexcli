@@ -9,9 +9,9 @@ import (
 func main() {
 
 	cfg := config{
-		endpoint: "locations",
+		endpoint: "location",
 		limit:    20,
-		page:     0,
+		page:     -1,
 	}
 
 	fmt.Printf("Pokedex > ")
@@ -22,9 +22,6 @@ func main() {
 		cmd := matchCommand(scanner.Text(), &cfg)
 		cmd.callback()
 
-		url := createURL(&cfg)
-
-		fmt.Printf("URL: %s\n", url)
 		fmt.Printf("Pokedex > ")
 	}
 }
