@@ -11,7 +11,7 @@ func getAndPrintPage(cfg *config) {
 	url := createURL(cfg)
 	fmt.Printf("URL: %s\n", url)
 
-	pageInfo := getPageInfo(url)
+	pageInfo := getPageInfo(cfg, url)
 
 	for _, page := range pageInfo.Results {
 		fmt.Println(page.Name)

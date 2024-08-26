@@ -20,25 +20,31 @@ type Result struct {
 	URL  string `json:"url"`
 }
 
-func getPageInfo(url string) Page {
+func getPageInfo(cfg *config, url string) Page {
 
-	// GET
-	res, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-	if err != nil {
-		log.Fatal(err)
+	// get bytes from cache, if in cache
+	body, ok := cfg.cache.Get(url)
+
+	// if not in cache, HTTP
+	if !ok {
+		// GET
+		res, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		body, err = io.ReadAll(res.Body)
+		res.Body.Close()
+		if res.StatusCode > 299 {
+			log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// Unmarshal
 	page := Page{}
-	err = json.Unmarshal(body, &page)
+	err := json.Unmarshal(body, &page)
 	if err != nil {
 		fmt.Println(err)
 	}
