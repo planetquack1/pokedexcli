@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
 )
 
 func main() {
@@ -13,6 +14,8 @@ func main() {
 		limit:    20,
 		page:     -1,
 	}
+
+	cache := pokecache.newCache(5 * time.Second)
 
 	fmt.Printf("Pokedex > ")
 
