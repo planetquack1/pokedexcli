@@ -1,15 +1,5 @@
 package main
 
-type MapPage struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	}
-}
-
 type ExplorePage struct {
 	EncounterMethodRates []struct {
 		EncounterMethod struct {
@@ -64,4 +54,14 @@ type ExplorePage struct {
 			} `json:"version"`
 		} `json:"version_details"`
 	} `json:"pokemon_encounters"`
+}
+
+type MapPage struct {
+	Count    int    `json:"count"`
+	Next     string `json:"next"`
+	Previous string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	}
 }

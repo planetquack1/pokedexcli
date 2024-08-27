@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/mtslzr/pokeapi-go"
 )
 
 type cliCommand struct {
@@ -14,7 +16,7 @@ type cliCommand struct {
 
 func matchCommand(input string, cfg *Config) cliCommand {
 
-	// Check if the input starts with "explore"
+	// Check if the input starts with "explore" or "catch"
 	if strings.HasPrefix(input, "explore ") {
 		location := strings.TrimPrefix(input, "explore ")
 		return cliCommand{
@@ -22,6 +24,16 @@ func matchCommand(input string, cfg *Config) cliCommand {
 			description: "Explore the specified location",
 			callback: func() error {
 				return cfg.commandExplore(location)
+			},
+		}
+	}
+	if strings.HasPrefix(input, "catch ") {
+		pokemonToCatch := strings.TrimPrefix(input, "catch ")
+		return cliCommand{
+			name:        "catch",
+			description: "Catch the specified Pokemon",
+			callback: func() error {
+				return cfg.commandCatch(pokemonToCatch)
 			},
 		}
 	}
@@ -52,6 +64,12 @@ func matchCommand(input string, cfg *Config) cliCommand {
 			description: "Get the previous 20 locations",
 			callback:    cfg.commandMapb,
 		}
+	case "pokedex":
+		return cliCommand{
+			name:        "pokedex",
+			description: "List the pokedex",
+			callback:    cfg.commandPokedex,
+		}
 	default:
 		return cliCommand{
 			name:        "unknown",
@@ -74,11 +92,32 @@ func commandExit() error {
 func (cfg *Config) commandExplore(location string) error {
 	cfg.commandType = "explore"
 	cfg.endpoint = "location-area"
+
 	cfg.location = location
 
 	fmt.Printf("Exploring %s area...\n", location)
 
-	getAndPrintPage(cfg)
+	getAndPrintResponse(cfg)
+
+	return nil
+}
+
+func (cfg *Config) commandCatch(pokemonToCatch string) error {
+	cfg.commandType = "catch"
+	cfg.endpoint = "pokemon"
+
+	p, err := pokeapi.Pokemon(pokemonToCatch)
+	if err != nil {
+		fmt.Printf("Error retrieving %s\n", pokemonToCatch)
+		return nil
+	}
+
+	cfg.pokemon = p
+	cfg.baseExperience = p.BaseExperience
+
+	fmt.Printf("Pokemon has base experience %d\n", p.BaseExperience)
+
+	getAndPrintResponse(cfg)
 
 	return nil
 }
@@ -88,7 +127,7 @@ func (cfg *Config) commandMap() error {
 	cfg.endpoint = "location"
 	cfg.page++
 
-	getAndPrintPage(cfg)
+	getAndPrintResponse(cfg)
 
 	return nil
 }
@@ -97,12 +136,23 @@ func (cfg *Config) commandMapb() error {
 	cfg.commandType = "map"
 	cfg.endpoint = "location"
 	if cfg.page <= 0 {
-		fmt.Printf("Error: you are on the first page.\n")
+		fmt.Printf("Warning: you are on the first page.\n")
 		return nil
 	}
 	cfg.page--
 
-	getAndPrintPage(cfg)
+	getAndPrintResponse(cfg)
+
+	return nil
+}
+
+func (cfg *Config) commandPokedex() error {
+
+	fmt.Println("Your Pokedex:")
+
+	for _, pokemon := range cfg.pokedex {
+		fmt.Printf("- %s\n", pokemon.Name)
+	}
 
 	return nil
 }
