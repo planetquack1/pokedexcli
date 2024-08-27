@@ -13,11 +13,13 @@ func main() {
 
 	c := pokecache.NewCache(5 * time.Second)
 
-	cfg := config{
-		cache:    &c,
-		endpoint: "location",
-		limit:    20,
-		page:     -1,
+	cfg := Config{
+		cache:       &c,
+		endpoint:    "location",
+		location:    "",
+		commandType: "map",
+		limit:       20,
+		page:        -1,
 	}
 
 	fmt.Printf("Pokedex > ")

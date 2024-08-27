@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type cliCommand struct {
@@ -11,8 +12,21 @@ type cliCommand struct {
 	callback    func() error
 }
 
-func matchCommand(input string, cfg *config) cliCommand {
+func matchCommand(input string, cfg *Config) cliCommand {
 
+	// Check if the input starts with "explore"
+	if strings.HasPrefix(input, "explore ") {
+		location := strings.TrimPrefix(input, "explore ")
+		return cliCommand{
+			name:        "explore",
+			description: "Explore the specified location",
+			callback: func() error {
+				return cfg.commandExplore(location)
+			},
+		}
+	}
+
+	// Handle other commands
 	switch input {
 	case "help":
 		return cliCommand{
@@ -57,7 +71,21 @@ func commandExit() error {
 	return nil
 }
 
-func (cfg *config) commandMap() error {
+func (cfg *Config) commandExplore(location string) error {
+	cfg.commandType = "explore"
+	cfg.endpoint = "location-area"
+	cfg.location = location
+
+	fmt.Printf("Exploring %s area...\n", location)
+
+	getAndPrintPage(cfg)
+
+	return nil
+}
+
+func (cfg *Config) commandMap() error {
+	cfg.commandType = "map"
+	cfg.endpoint = "location"
 	cfg.page++
 
 	getAndPrintPage(cfg)
@@ -65,7 +93,9 @@ func (cfg *config) commandMap() error {
 	return nil
 }
 
-func (cfg *config) commandMapb() error {
+func (cfg *Config) commandMapb() error {
+	cfg.commandType = "map"
+	cfg.endpoint = "location"
 	if cfg.page <= 0 {
 		fmt.Printf("Error: you are on the first page.\n")
 		return nil
