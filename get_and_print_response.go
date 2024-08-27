@@ -13,8 +13,6 @@ import (
 
 func getAndPrintResponse(cfg *Config) {
 
-	// Unmarshal based on endpoint
-
 	switch cfg.commandType {
 	case "map":
 
@@ -44,6 +42,7 @@ func getAndPrintResponse(cfg *Config) {
 
 		page := MapPage{}
 
+		// Unmarshal
 		err := json.Unmarshal(body, &page)
 		if err != nil {
 			fmt.Println(err)
@@ -69,10 +68,10 @@ func getAndPrintResponse(cfg *Config) {
 	case "catch":
 
 		var chanceOneIn int
-		if cfg.baseExperience < 50 {
+		if cfg.pokemon.BaseExperience < 50 {
 			chanceOneIn = 1
 		} else {
-			chanceOneIn = cfg.baseExperience / 50
+			chanceOneIn = cfg.pokemon.BaseExperience / 50
 		}
 
 		fmt.Printf("Chance of catching is 1 in %d\n", chanceOneIn)
@@ -82,6 +81,31 @@ func getAndPrintResponse(cfg *Config) {
 			addPokemon(cfg)
 		} else {
 			fmt.Printf("%s escaped!\n", cfg.pokemon.Name)
+		}
+
+	case "inspect":
+
+		p, ok := cfg.pokedex[cfg.pokemon.Name]
+
+		if !ok {
+			fmt.Printf("you have not yet caught %s\n", cfg.pokemon.Name)
+			return
+		}
+
+		// Print stats
+		fmt.Printf("Name: %s\n", p.Name)
+		fmt.Printf("Height: %d\n", p.Height)
+		fmt.Printf("Weight: %d\n", p.Weight)
+		fmt.Printf("Stats:\n")
+		fmt.Printf("  -hp: %d\n", p.Stats[0].BaseStat)
+		fmt.Printf("  -attack: %d\n", p.Stats[1].BaseStat)
+		fmt.Printf("  -defense: %d\n", p.Stats[2].BaseStat)
+		fmt.Printf("  -special-attack: %d\n", p.Stats[3].BaseStat)
+		fmt.Printf("  -special-defense: %d\n", p.Stats[4].BaseStat)
+		fmt.Printf("  -special-defense: %d\n", p.Stats[5].BaseStat)
+		fmt.Printf("Types:\n")
+		for _, t := range p.Types {
+			fmt.Printf("  - %s\n", t.Type.Name)
 		}
 
 	default:

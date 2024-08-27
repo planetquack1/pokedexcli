@@ -21,15 +21,14 @@ func main() {
 	}
 
 	cfg := Config{
-		cache:          &c,
-		pokedex:        make(map[string]structs.Pokemon),
-		endpoint:       "location",
-		location:       "",
-		pokemon:        p,
-		commandType:    "map",
-		baseExperience: 200, // default
-		limit:          20,
-		page:           -1,
+		cache:       &c,
+		pokedex:     make(map[string]structs.Pokemon),
+		endpoint:    "location",
+		location:    "",
+		pokemon:     p, // default
+		commandType: "map",
+		limit:       20,
+		page:        -1,
 	}
 
 	fmt.Printf("Pokedex > ")

@@ -16,7 +16,7 @@ type cliCommand struct {
 
 func matchCommand(input string, cfg *Config) cliCommand {
 
-	// Check if the input starts with "explore" or "catch"
+	// Check if the input starts with a command
 	if strings.HasPrefix(input, "explore ") {
 		location := strings.TrimPrefix(input, "explore ")
 		return cliCommand{
@@ -34,6 +34,16 @@ func matchCommand(input string, cfg *Config) cliCommand {
 			description: "Catch the specified Pokemon",
 			callback: func() error {
 				return cfg.commandCatch(pokemonToCatch)
+			},
+		}
+	}
+	if strings.HasPrefix(input, "inspect ") {
+		pokemonToInspect := strings.TrimPrefix(input, "inspect ")
+		return cliCommand{
+			name:        "inspect",
+			description: "Inspect the specified Pokemon",
+			callback: func() error {
+				return cfg.commandInspect(pokemonToInspect)
 			},
 		}
 	}
@@ -113,9 +123,25 @@ func (cfg *Config) commandCatch(pokemonToCatch string) error {
 	}
 
 	cfg.pokemon = p
-	cfg.baseExperience = p.BaseExperience
 
 	fmt.Printf("Pokemon has base experience %d\n", p.BaseExperience)
+
+	getAndPrintResponse(cfg)
+
+	return nil
+}
+
+func (cfg *Config) commandInspect(pokemonToInspect string) error {
+	cfg.commandType = "inspect"
+	cfg.endpoint = "pokemon"
+
+	p, err := pokeapi.Pokemon(pokemonToInspect)
+	if err != nil {
+		fmt.Printf("Error retrieving %s\n", pokemonToInspect)
+		return nil
+	}
+
+	cfg.pokemon = p
 
 	getAndPrintResponse(cfg)
 
